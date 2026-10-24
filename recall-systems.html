@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recall Systems — Stop losing patients to missed calls</title>
+<meta name="description" content="Recall Systems builds missed-call text-back + after-hours booking for dental clinics. Every missed call gets a text in under 60 seconds, 24/7 — and books the appointment.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    color-scheme:light;
+    --ink:#0e1a2b; --ink-soft:#334155; --muted:#64748b;
+    --bg:#ffffff; --bg-alt:#f4f6f9; --line:#e2e8f0;
+    --accent:#0e7c66; --accent-dark:#0a5f4e; --accent-soft:#e6f4f0;
+    --warn:#b45309; --warn-soft:#fef3e2;
+    --card:#ffffff; --header-bg:rgba(255,255,255,.94); --hero-a:#f8fafc; --hero-b:#ffffff;
+    --input-bg:#ffffff; --footer-bg:#f8fafc;
+    --radius:14px; --max:1060px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      color-scheme:dark;
+      --ink:#e8eef6; --ink-soft:#c3cedd; --muted:#94a3b8;
+      --bg:#0b1422; --bg-alt:#101d30; --line:#24344d;
+      --accent:#2fb598; --accent-dark:#7dd3c0; --accent-soft:#12332c;
+      --warn:#f0b35c; --warn-soft:#2b2113;
+      --card:#132238; --header-bg:rgba(11,20,34,.94); --hero-a:#0e1a2b; --hero-b:#0b1422;
+      --input-bg:#0e1a2b; --footer-bg:#0e1a2b;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+  header.top{position:sticky;top:0;z-index:50;background:var(--header-bg);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  header.top .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 22px}
+  .brand{font-weight:800;letter-spacing:-.02em;font-size:1.05rem}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--ink-soft);text-decoration:none;font-size:.92rem;margin-left:20px}
+  nav a:hover{color:var(--accent-dark)}
+  .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:13px 26px;border-radius:10px;text-decoration:none;border:0;cursor:pointer;font-size:1rem;transition:background .15s}
+  .btn:hover{background:var(--accent-dark)}
+  .btn-ghost{background:var(--card);color:var(--accent-dark);border:2px solid var(--accent)}
+  .btn-ghost:hover{background:var(--accent-soft)}
+  section{padding:72px 0}
+  .eyebrow{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-dark);background:var(--accent-soft);padding:6px 14px;border-radius:999px;margin-bottom:18px}
+  h1{font-size:clamp(2rem,4.6vw,3.3rem);line-height:1.12;letter-spacing:-.03em;margin-bottom:18px}
+  h2{font-size:clamp(1.5rem,3vw,2.1rem);letter-spacing:-.02em;margin-bottom:14px;line-height:1.25}
+  h3{font-size:1.12rem;margin-bottom:8px}
+  p.lead{font-size:1.15rem;color:var(--ink-soft);max-width:640px;margin-bottom:28px}
+  .hero{background:linear-gradient(180deg,var(--hero-a) 0%,var(--hero-b) 100%);padding:88px 0 72px;border-bottom:1px solid var(--line)}
+  .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:44px;align-items:center}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+  .hero-note{font-size:.85rem;color:var(--muted);margin-top:16px}
+  .phone-mock{background:var(--ink);border-radius:26px;padding:26px 22px;color:#e2e8f0;max-width:330px;margin:0 auto;box-shadow:0 24px 60px -18px rgba(14,26,43,.35)}
+  .phone-mock .bar{height:8px;width:90px;background:#334155;border-radius:99px;margin:0 auto 20px}
+  .bubble{background:#1e293b;border-radius:14px;padding:12px 15px;margin-bottom:12px;font-size:.9rem;line-height:1.5}
+  .bubble.them{background:#0e7c66;color:#fff;margin-left:34px;border-bottom-right-radius:4px}
+  .bubble.us{background:#243349;margin-right:34px;border-bottom-left-radius:4px}
+  .bubble .t{display:block;font-size:.72rem;color:#94a3b8;margin-top:6px}
+  .bubble.them .t{color:#c9efe4}
+  .math{background:var(--bg-alt)}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:30px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .stat .num{font-size:1.9rem;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+  .stat .num em{font-style:normal;color:var(--accent-dark)}
+  .stat p{font-size:.88rem;color:var(--ink-soft);margin-top:6px}
+  .calc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-top:8px}
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:.85rem;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
+  .field input{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:8px;font-size:1rem;background:var(--input-bg);color:var(--ink)}
+  .calc-out{background:var(--warn-soft);border:1px solid #f3d9a8;border-radius:10px;padding:20px}
+  .calc-out .big{font-size:2rem;font-weight:800;color:var(--warn);letter-spacing:-.02em}
+  .calc-out p{font-size:.85rem;color:var(--ink-soft)}
+  .fine{font-size:.8rem;color:var(--muted);margin-top:14px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:30px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;position:relative}
+  .step .n{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;margin-bottom:14px}
+  .tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:30px;align-items:stretch}
+  .tier{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px;display:flex;flex-direction:column}
+  .tier.featured{border:2px solid var(--accent);box-shadow:0 18px 44px -20px rgba(14,124,102,.35)}
+  .tier .price{font-size:2.1rem;font-weight:800;letter-spacing:-.02em;margin:8px 0 4px}
+  .tier .per{font-size:.85rem;color:var(--muted);margin-bottom:16px}
+  .tier ul{list-style:none;margin-bottom:24px;flex:1}
+  .tier li{font-size:.93rem;color:var(--ink-soft);padding:7px 0 7px 28px;position:relative}
+  .tier li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:800}
+  .tier li.no{color:var(--muted)}
+  .tier li.no::before{content:"–";color:var(--muted)}
+  .guarantee{background:var(--ink);color:#e2e8f0}
+  .guarantee h2{color:#fff}
+  .guarantee p{color:#b6c2d2;max-width:680px}
+  .guarantee .box{border:1px solid #2b3b52;border-radius:var(--radius);padding:26px;margin-top:24px;background:#14243a}
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-q{width:100%;background:none;border:0;text-align:left;font-size:1.02rem;font-weight:700;color:var(--ink);padding:20px 4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .faq-q .plus{font-size:1.4rem;color:var(--accent);flex-shrink:0;transition:transform .2s}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;color:var(--ink-soft);font-size:.95rem}
+  .faq-a p{padding:0 4px 22px}
+  .faq-item.open .plus{transform:rotate(45deg)}
+  .demo{background:var(--bg-alt)}
+  .demo-script{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-top:20px}
+  .demo-script ol{margin:12px 0 0 20px;color:var(--ink-soft);font-size:.95rem}
+  .demo-script li{margin-bottom:10px}
+  .demo-script li strong{color:var(--ink)}
+  form.contact{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px;max-width:620px;margin-top:24px}
+  form.contact .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  form.contact input,form.contact textarea,form.contact select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;font-size:1rem;font-family:inherit;background:var(--input-bg);color:var(--ink)}
+  form.contact textarea{min-height:110px;resize:vertical}
+  .dev-note{background:#fffbeb;border:1px dashed #d97706;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#92400e;margin-top:16px}
+  footer{border-top:1px solid var(--line);padding:44px 0 60px;background:var(--footer-bg)}
+  footer h4{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+  footer ol{font-size:.78rem;color:var(--muted);margin-left:18px}
+  footer li{margin-bottom:6px}
+  footer a{color:var(--accent-dark);word-break:break-all}
+  .foot-brand{margin-bottom:26px;font-size:.9rem;color:var(--ink-soft)}
+  @media(max-width:760px){
+    .hero-grid{grid-template-columns:1fr}
+    .calc-grid{grid-template-columns:1fr}
+    form.contact .row{grid-template-columns:1fr}
+    section{padding:52px 0}
+    nav a:not(:last-child){display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Recall<span> Systems</span></div>
+    <nav>
+      <a href="#math">The math</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact" class="btn" style="padding:9px 18px">Book a leak audit</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">For dental clinics · UK + US</span>
+      <h1>Every missed call is a patient you paid to acquire — then handed to the clinic down the road.</h1>
+      <p class="lead">When your phone rings out, the caller doesn't wait. They dial the next listing. Recall Systems texts every missed caller back in under 60 seconds and books the appointment — nights, weekends, lunch rush, 24/7.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn">Book the $997 leak audit</a>
+        <a href="#math" class="btn btn-ghost">See the math first</a>
+      </div>
+      <p class="hero-note">We're new and we say so — no fake testimonials, no invented client numbers. The audit is refundable if it doesn't find 3 costed leaks.</p>
+    </div>
+    <div>
+      <div class="phone-mock" aria-label="Example text conversation">
+        <div class="bar"></div>
+        <div class="bubble us">📞 Missed call — 7:42pm<span class="t">Patient called, nobody picked up</span></div>
+        <div class="bubble them">Hi, this is Brightside Dental — sorry we missed you! Were you looking to book an appointment? Reply with what you need and I'll sort it now.<span class="t">Sent 7:42pm · 38 seconds later</span></div>
+        <div class="bubble us">Yes please — toothache, tomorrow morning if possible<span class="t">7:44pm</span></div>
+        <div class="bubble them">Done — you're booked with Dr. Patel tomorrow at 9:20am. We'll text a reminder tonight. Anything urgent before then, call the practice line.<span class="t">7:44pm</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATH -->
+<section class="math" id="math">
+  <div class="wrap">
+    <span class="eyebrow">The economics</span>
+    <h2>Missed calls aren't an annoyance. They're a line item.</h2>
+    <p class="lead">Published industry data on what dental clinics actually miss — and what each miss is worth.</p>
+    <div class="stat-grid">
+      <div class="stat"><div class="num"><em>27%</em></div><p>of inbound calls to dental organizations go unanswered; 37% of calls are leads <b>(Invoca)</b></p></div>
+      <div class="stat"><div class="num"><em>38%</em></div><p>of 4,280 inbound calls across 26 dental practices went unanswered <b>(Peerlogic, Feb 2026)</b></p></div>
+      <div class="stat"><div class="num"><em>20%</em></div><p>of inbound <b>new-patient</b> calls missed by the average US dental practice <b>(Weave)</b></p></div>
+      <div class="stat"><div class="num"><em>$200–300</em></div><p>immediate revenue per missed dental call; $15,000+ lifetime value <b>(Patient Prism 2026)</b></p></div>
+      <div class="stat"><div class="num"><em>&lt;3%</em></div><p>of callers sent to voicemail during a sales interaction leave a message <b>(Invoca)</b></p></div>
+      <div class="stat"><div class="num"><em>~100×</em></div><p>higher odds of contacting a lead at 5 minutes vs. 30 minutes <b>(InsideSales/Oldroyd 2007)</b></p></div>
+    </div>
+
+    <div class="calc">
+      <h3>Your clinic's leak — an illustration</h3>
+      <p class="fine" style="margin-top:0">Adjust the numbers. The miss rate and per-call value come from the published sources above; the arithmetic is yours.</p>
+      <div class="calc-grid" style="margin-top:18px">
+        <div>
+          <div class="field"><label for="calls">Inbound calls per day</label><input type="number" id="calls" value="25" min="1" max="500"></div>
+          <div class="field"><label for="missrate">Miss rate % (published range 20–38)</label><input type="number" id="missrate" value="27" min="1" max="90"></div>
+          <div class="field"><label for="callval">Immediate revenue per missed call, $ (published range 200–300)</label><input type="number" id="callval" value="250" min="10" max="2000"></div>
+          <div class="field"><label for="days">Working days per month</label><input type="number" id="days" value="26" min="1" max="31"></div>
+        </div>
+        <div class="calc-out">
+          <p>Estimated missed calls / month</p>
+          <div class="big" id="out-calls">–</div>
+          <p style="margin-top:14px">Revenue <b>at risk</b> per month</p>
+          <div class="big" id="out-money">–</div>
+          <p class="fine">Illustration only — not a promise. "At risk" ≠ lost: some callers try again. The $997 audit prices <i>your</i> exposure using <i>your</i> call patterns.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <span class="eyebrow">How it works</span>
+    <h2>Three steps. Your number doesn't change.</h2>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>We find the leaks</h3><p>The $997 Revenue Leak Audit mystery-shops your phones — busy periods, lunch, after hours — and hands you a costed report plus a 90-second video. If it doesn't name 3 specific leaks with costed estimates, it's refunded.</p></div>
+      <div class="step"><div class="n">2</div><h3>We build the safety net</h3><p>In 5–7 days the system goes live on your existing number: every missed call gets a text back in under 60 seconds, questions get answered, appointments get booked into your calendar — 24/7. Emergencies escalate to your team immediately; the system never gives clinical advice.</p></div>
+      <div class="step"><div class="n">3</div><h3>It keeps ringing</h3><p>Optional monthly retainer: we monitor the system, fix anything that breaks, tune the conversations, and send you a one-page report of what it caught. Cancel anytime.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="math" id="pricing">
+  <div class="wrap">
+    <span class="eyebrow">Pricing</span>
+    <h2>Priced against the revenue it recovers. Not against software.</h2>
+    <p class="lead">One missed new-patient call carries $200–$300 in immediate revenue (Patient Prism 2026). The build pays for itself if it recovers a handful of calls a year.</p>
+    <div class="tiers">
+      <div class="tier">
+        <span class="eyebrow">Tier 1</span>
+        <h3>Revenue Leak Audit</h3>
+        <div class="price">$997</div><div class="per">one-time · 48-hour turnaround</div>
+        <ul>
+          <li>Mystery-shop: busy period, lunch, after hours</li>
+          <li>After-hours booking gap test</li>
+          <li>Google review scan for access complaints</li>
+          <li>Costed leak report + 90-second Loom video</li>
+          <li>Fixed quote for the build</li>
+          <li class="no">No changes to your phone system</li>
+        </ul>
+        <p class="fine"><b>Guarantee:</b> full refund if it doesn't name 3 costed leaks. <b>Credit:</b> the $997 comes off the build if you proceed within 14 days.</p>
+        <a href="#contact" class="btn" style="margin-top:18px;text-align:center">Book the audit</a>
+      </div>
+      <div class="tier featured">
+        <span class="eyebrow">Tier 2 · most clinics start here</span>
+        <h3>Missed-Call Recovery Build</h3>
+        <div class="price">$3,500–$4,800</div><div class="per">fixed quote in writing · live in 5–7 days</div>
+        <ul>
+          <li>Instant SMS text-back on every missed call (&lt;60 sec, 24/7)</li>
+          <li>Conversational booking into your calendar</li>
+          <li>Emergency escalation to your team — never clinical advice</li>
+          <li>Staff alert on every captured lead</li>
+          <li>30 days tuning + weekly capture reports</li>
+          <li>Full credential handover — you own the setup</li>
+          <li class="no">No bulk marketing texts, ever</li>
+        </ul>
+        <p class="fine"><b>Payment:</b> 50% to start, 50% at go-live. <b>Guarantee:</b> full refund if we can't go live in 7 days for reasons on our side.</p>
+        <a href="#contact" class="btn" style="margin-top:18px;text-align:center">Start with the audit</a>
+      </div>
+      <div class="tier">
+        <span class="eyebrow">Tier 3</span>
+        <h3>Keep It Ringing</h3>
+        <div class="price">$497–$997<span style="font-size:1rem">/mo</span></div><div class="per">retainer · cancel anytime (30 days' notice)</div>
+        <ul>
+          <li>24/7 monitoring + break-fix (1 business day target)</li>
+          <li>Monthly conversation tuning from real transcripts</li>
+          <li>Monthly one-page capture report</li>
+          <li>Quarterly review call</li>
+          <li class="no">No new workflow builds (quoted separately)</li>
+          <li class="no">Carrier/message fees excluded</li>
+        </ul>
+        <p class="fine">Base tier covers up to 300 missed-call conversations/month; upper tier up to 750. Overages quoted in advance.</p>
+        <a href="#contact" class="btn btn-ghost" style="margin-top:18px;text-align:center">Ask about the retainer</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee">
+  <div class="wrap">
+    <span class="eyebrow" style="background:#1e3a5f;color:#9fc5e8">Our guarantee</span>
+    <h2>We're new. So we made the audit risk-free.</h2>
+    <p>No testimonials, no invented case studies, no "trusted by" logos — because we won't fabricate social proof. Instead:</p>
+    <div class="box">
+      <p style="color:#fff;font-size:1.05rem"><b>If the Revenue Leak Audit doesn't name at least 3 specific revenue leaks with costed estimates, you get a full refund.</b> No forms, no restocking fee, no argument. And if you proceed to the build within 14 days, the $997 comes straight off the price.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="wrap">
+    <span class="eyebrow">The 90-second demo</span>
+    <h2>Watch a missed call become a booked appointment.</h2>
+    <p class="lead">This is the entire product, end to end — the same sequence we run live on a sales call:</p>
+    <div class="demo-script">
+      <ol>
+        <li><strong>0:00 — The call.</strong> We dial the clinic's number from a mobile and let it ring out, exactly as a patient would at 7:42pm. On screen: the call timer, the clinic's real number.</li>
+        <li><strong>0:15 — The text-back.</strong> Within 60 seconds, the missed caller receives an SMS from the clinic's number: name, apology, one question. On screen: the actual message arriving on the phone.</li>
+        <li><strong>0:35 — The conversation.</strong> The "patient" replies: <i>"Toothache — tomorrow morning if possible."</i> The system asks one clarifying question (new or existing patient), then offers two real open slots pulled from the calendar.</li>
+        <li><strong>1:00 — The booking.</strong> Patient picks 9:20am. The appointment lands in the clinic's calendar; the patient gets a confirmation text. On screen: the calendar entry appearing in real time.</li>
+        <li><strong>1:20 — The staff alert.</strong> The practice manager gets a summary: who called, what they needed, what was booked — no action required unless it's flagged urgent.</li>
+        <li><strong>1:30 — The math.</strong> One recovered call: ~$250 of immediate revenue (Patient Prism 2026). The build costs less than twenty such calls a year.</li>
+      </ol>
+      <p class="fine">Demo uses a test number and test calendar — no real patients are ever contacted during demonstrations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <span class="eyebrow">FAQ</span>
+    <h2>The hard questions, answered straight.</h2>
+    <div style="margin-top:20px;max-width:760px">
+      <div class="faq-item">
+        <button class="faq-q">You have no testimonials. Why should I trust you?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Fair question — and we won't fake an answer. We're new, so there are no client logos here and no invented case studies. That's why the offer is structured the way it is: the $997 audit is diagnosis only, refundable if it doesn't find 3 costed leaks, and credited toward the build. You see our work in writing before committing to anything bigger.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Who maintains the system after go-live?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Your choice. Stay on the Keep It Ringing retainer and we monitor, fix, and tune it monthly. Or don't — it's built on standard tools (your business number, a registered texting service, your calendar) and the handover pack transfers every credential to you. Nothing is held hostage; if you leave, the system keeps running.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What if it breaks at 2am on a Saturday?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Two safety nets. The retainer includes monitoring — if the text-back stops firing, we're alerted and fix it, target one business day. And the fallback is graceful: if our system ever fails, missed calls route to your normal voicemail exactly as they do today. You're never worse off than your current setup.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is it legal to text patients who called us?<span class="plus">+</span></button>
+        <div class="faq-a"><p>What we build is narrow and conservative: the system only texts people who just called your clinic — a direct, one-to-one reply to their call, never a marketing blast. In the US, business texting runs through registered 10DLC numbers, every message identifies your clinic, and STOP requests are honored automatically. In the UK, a service reply to an inbound call (like booking the appointment they asked about) isn't direct marketing under PECR; marketing texts are never sent. We're not lawyers — check anything you're unsure about with your own counsel.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Why not just buy an AI receptionist SaaS myself?<span class="plus">+</span></button>
+        <div class="faq-a"><p>You might — and we'll tell you if that's the better move. Honest comparison: SaaS receptionists run roughly $99–$349/month per line, and you configure everything yourself: scripts, calendar, compliance, testing. We do all of that for you, dental-specific, measured against an audit of your actual leaks, and you own the setup when we're done. If your call volume is low and you're comfortable configuring software, SaaS may genuinely be cheaper. The audit will say so if that's the case.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="math" id="contact">
+  <div class="wrap">
+    <span class="eyebrow">Book a leak audit</span>
+    <h2>Tell us where to send your audit.</h2>
+    <p class="lead">$997 · 48-hour turnaround · refunded if it doesn't find 3 costed leaks · credited toward the build within 14 days.</p>
+    <form class="contact" action="mailto:recall.systems@proton.me?subject=Leak%20audit%20request" method="post" enctype="text/plain">
+      <div class="row">
+        <div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" required placeholder="Jane Smith"></div>
+        <div class="field"><label for="role">Role</label><input id="role" name="role" type="text" placeholder="Practice manager / owner"></div>
+      </div>
+      <div class="field"><label for="clinic">Clinic name</label><input id="clinic" name="clinic" type="text" required placeholder="Brightside Dental"></div>
+      <div class="row">
+        <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" required placeholder="jane@brightsidedental.com"></div>
+        <div class="field"><label for="phone">Clinic phone</label><input id="phone" name="phone" type="tel" placeholder="+1 (555) 010-2030"></div>
+      </div>
+      <div class="field"><label for="interest">I'm interested in</label>
+        <select id="interest" name="interest">
+          <option>Revenue Leak Audit — $997</option>
+          <option>Recovery Build — $3,500–$4,800 (start with the audit)</option>
+          <option>Keep It Ringing retainer — question</option>
+          <option>Just the free 90-second video first</option>
+        </select>
+      </div>
+      <div class="field"><label for="msg">Anything we should know? (optional)</label><textarea id="msg" name="message" placeholder="e.g., We close at 6pm and get a lot of evening calls we can't answer."></textarea></div>
+      <button type="submit" class="btn">Request the audit →</button>
+      <p class="fine">We reply within one business day. No spam, no drip sequence — one human reply.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-brand"><b>Recall Systems</b> — an independent automation consultancy for dental clinics. One product: missed-call text-back + after-hours booking. No fake testimonials. No invented numbers.</div>
+    <h4>Figures &amp; sources</h4>
+    <ol>
+      <li>Dental organizations miss 27% of inbound calls; 37% of calls are leads; 26% convert — Invoca: <a href="https://www.Invoca.com/uk/blog/how-many-phone-calls-are-you-missing">invoca.com/uk/blog/how-many-phone-calls-are-you-missing</a></li>
+      <li>27% of home-services calls unanswered — Invoca: <a href="https://www.invoca.com/blog/how-much-missed-sales-calls-cost-home-services-businesses">invoca.com/blog/how-much-missed-sales-calls-cost-home-services-businesses</a></li>
+      <li>38% of 4,280 dental calls unanswered across 26 practices (Feb 2026); Patient Prism 2026 metrics: $200–$300 immediate revenue, $15,000+ lifetime value per missed call — Peerlogic: <a href="https://www.peerlogic.com/post/peerlogic-dso-case-study">peerlogic.com/post/peerlogic-dso-case-study</a></li>
+      <li>Average US dental practice misses 20% of inbound new-patient calls — Weave: <a href="https://www.getweave.com/dental-telephone-scripts/">getweave.com/dental-telephone-scripts</a></li>
+      <li>~30–35% of calls unanswered during business hours at onboarding — Patient Prism: <a href="https://blog.patientprism.com/insights-into-dental-group-marketing-with-gary-bird-patient-prism-blog">blog.patientprism.com …/insights-into-dental-group-marketing</a></li>
+      <li>Fewer than 3% of callers sent to voicemail in a sales interaction leave a message — Invoca platform data (via 800response): <a href="https://800response.com/blog/someone-is-calling-your-roofing-business-but-are-you-picking-up/">800response.com …/missed-call-monitor-alerts</a></li>
+      <li>~100× higher contact odds calling a lead at 5 min vs 30 min (InsideSales.com/Oldroyd, 2007); HBR/Oldroyd 2011: ~7× more likely to qualify within an hour, 42-hour average response — via: <a href="https://www.usecarly.com/blog/speed-to-lead-statistics/">usecarly.com/blog/speed-to-lead-statistics</a></li>
+      <li>Consumer behavior (CallRail 2025; YouGov for Answer4u 2026, UK) — via: <a href="https://www.usecarly.com/blog/missed-call-statistics/">usecarly.com/blog/missed-call-statistics</a></li>
+      <li>US texting: TCPA prior express written consent for marketing texts; FCC 24-17 (AI voices = "artificial" voice); 10DLC registration required by carriers — <a href="https://www.kelleydrye.com/viewpoints/blogs/ad-law-access/eleventh-circuit-vacates-tcpa-11-consent-rule">kelleydrye.com</a> · <a href="https://successwithmarkglobal.com/missed-call-text-back">successwithmarkglobal.com</a></li>
+      <li>UK texting: PECR Regulation 22 — consent/soft opt-in for marketing texts; service messages excluded — ICO: <a href="https://cy.ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/sending-direct-marketing-choosing-your-lawful-basis/">ico.org.uk …/sending-direct-marketing</a></li>
+    </ol>
+    <p class="fine" style="margin-top:20px">© 2026 Recall Systems. Illustrative figures are labelled as such; cited statistics belong to their sources. This page is not legal advice.</p>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var q = item.querySelector('.faq-q'), a = item.querySelector('.faq-a');
+    q.addEventListener('click', function(){
+      var open = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){
+        o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null;
+      });
+      if(!open){ item.classList.add('open'); a.style.maxHeight = a.scrollHeight + 'px'; }
+    });
+  });
+  // Leak calculator
+  function fmt(n){ return n.toLocaleString('en-US', {maximumFractionDigits:0}); }
+  function calc(){
+    var calls = parseFloat(document.getElementById('calls').value) || 0;
+    var miss  = parseFloat(document.getElementById('missrate').value) || 0;
+    var val   = parseFloat(document.getElementById('callval').value) || 0;
+    var days  = parseFloat(document.getElementById('days').value) || 0;
+    var missed = Math.round(calls * (miss/100) * days);
+    document.getElementById('out-calls').textContent = fmt(missed);
+    document.getElementById('out-money').textContent = '$' + fmt(missed * val);
+  }
+  ['calls','missrate','callval','days'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', calc);
+  });
+  calc();
+</script>
+</body>
+</html>
